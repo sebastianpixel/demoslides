@@ -36,7 +36,7 @@ struct DefaultsImpl: Defaults {
 }
 
 public enum DefaultsKey: String {
-    case username
+    case username, selectedIssues
 }
 
 public protocol DefaultsValue {

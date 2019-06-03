@@ -35,9 +35,18 @@ public struct CreatePDFFromIssues: Procedure {
             Env.current.shell.write("\nAll highlighted issues will be printed. Toggle selection with Tab key.\n")
 
             // present the list of issues to the user to discard unwanted
-            let dataSource = GenericLineSelectorDataSource(items: issues) { "\($0.key) \($0.fields.summary)" }
-            guard let selectedIssues = LineSelector(dataSource: dataSource, preselectAll: true)?.multiSelection()?.output,
+            let previouslySelected = (Env.current.defaults[.selectedIssues] as [String]?) ?? []
+            let previouslySelectedContainsIssuesFromCurrentSprint = previouslySelected.isEmpty
+                ? false
+                : !Set(previouslySelected).intersection(issues.map { $0.key }).isEmpty
+            let dataSource = GenericLineSelectorDataSource(items: issues) {
+                ("\($0.key) \($0.fields.summary)", previouslySelectedContainsIssuesFromCurrentSprint
+                    ? previouslySelected.contains($0.key)
+                    : true)
+            }
+            guard let selectedIssues = LineSelector(dataSource: dataSource)?.multiSelection()?.output,
                 !selectedIssues.isEmpty else { throw Error.noIssuesSelected }
+            Env.current.defaults[.selectedIssues] = selectedIssues.map { $0.key }
 
             // remove the usage description for LineSelector
             LineDrawer(linesToDrawCount: 0).reset(lines: 3)
@@ -317,7 +326,7 @@ public struct CreatePDFFromIssues: Procedure {
         let newCategory: String?
         if Env.current.shell.promptDecision("New epic \"\(epic)\" found. Do you want to assign it to an existing category? (Otherwise create a new one.)") {
             let keys = config.categories.map { $0.key }
-            let dataSource = GenericLineSelectorDataSource(items: keys)
+            let dataSource = GenericLineSelectorDataSource(items: keys) { ($0, false) }
             newCategory = LineSelector(dataSource: dataSource)?.singleSelection()?.output
         } else {
             newCategory = Env.current.shell.prompt("New category")

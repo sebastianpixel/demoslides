@@ -18,7 +18,7 @@ public struct Initialize: Procedure {
 
         guard let projects = GetProjects().awaitResponseWithDebugPrinting() else { return false }
 
-        let dataSource = GenericLineSelectorDataSource(items: projects, line: \.description)
+        let dataSource = GenericLineSelectorDataSource(items: projects) { ($0.description, false) }
 
         guard let project = LineSelector(dataSource: dataSource)?.singleSelection()?.output?.key,
             let issues = GetIssues(

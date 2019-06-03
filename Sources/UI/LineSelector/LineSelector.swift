@@ -56,9 +56,9 @@ public final class LineSelector<DataSource: LineSelectorDataSource> {
     // Allows selecting lines by hitting the tab key.
     private var isMultiselectEnabled = false
 
-    public init?(dataSource: DataSource, preselectAll: Bool = false) {
+    public init?(dataSource: DataSource) {
         let numColumns = Env.current.shell.numColumns
-        allLines = dataSource.items.map { Line(text: $0.line, isSelected: preselectAll, item: $0, numColumns: numColumns, promptCharCount: Prompt.count) }
+        allLines = dataSource.items.map { Line(text: $0.line, isSelected: $0.isSelected, item: $0, numColumns: numColumns, promptCharCount: Prompt.count) }
 
         lineDrawer = LineDrawer(linesToDrawCount: min(allLines.count, linesToDrawCount))
 
