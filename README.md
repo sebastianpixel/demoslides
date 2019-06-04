@@ -17,7 +17,7 @@ You can then execute the tool via `demoslides`. If there is no configuration fil
 ## Configuration
 The tool is based on the assumption that you categorize your JIRA issues by fixVersions and epics. FixVersions can optionally be mapped to emoji (like when you use the fixVersions "iOS" => "🍏" or "Android" => "🤖"). If there is no mapping the default is to just print the fixVersion.
 
-The issues can also be mapped to "categories" if you want to bundle multiple epics to one like "Infrastructure", "Design" or "Analytics". When the config file is created at first all epics are mapped to one category. You can change this  by collecting multiple epics under the `epics` key of one category in `demoslides.yml`. If an issue has no epic link it will be mapped to the default category "Feature".
+The issues can also be mapped to "categories" if you want to bundle multiple epics to one like "Infrastructure", "Design" or "Analytics". When the config file is created at first a category is created for each epic. You can change this  by collecting multiple epics under the `epics` key of one category in `demoslides.yml`. If an issue has no epic link it will be mapped to the default category "Feature".
 
 The options to set in the config are:
 
