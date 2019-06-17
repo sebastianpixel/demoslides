@@ -178,8 +178,8 @@ public struct CreatePDFFromIssues: Procedure {
                     graphicsContext.fill(rect)
 
                     // draw category on background
-                    let categoryLabel = categoryDisplayName == epic.fields.name
-                        ? categoryDisplayName
+                    let categoryLabel = epic.fields.name.hasPrefix(categoryDisplayName)
+                        ? epic.fields.name
                         : "\(categoryDisplayName) / \(epic.fields.name)"
                     let categoryAttributes = config.fontSettings.category.attributes(color: .white, scale: scale)
                     let categoryAttributedString = NSAttributedString(string: categoryLabel, attributes: categoryAttributes)
