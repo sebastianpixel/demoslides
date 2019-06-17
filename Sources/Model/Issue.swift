@@ -12,10 +12,12 @@ public final class Issue {
     }
 
     public func cleansedDescription(ranges: [DescriptionRange], maxLines: Int) -> String? {
-        // strip nasty carriage returns and other weird newline combinations
-        guard let descriptionLines = fields.description?.components(separatedBy: .newlines).filter({ !$0.isEmpty }).map({ $0.trimmingCharacters(in: .whitespaces) }) else { return nil }
+        guard let descriptionLines = fields.description?
+            .replacingOccurrences(of: "\r", with: "")
+            .components(separatedBy: .newlines)
+            .map({ $0.trimmingCharacters(in: .whitespaces) }) else { return nil }
         let description = descriptionLines.joined(separator: "\n")
-        let charsToTrim = CharacterSet(charactersIn: "+*:_-()/").union(.whitespacesAndNewlines)
+        let charsToTrim = CharacterSet(charactersIn: "+*:-()/").union(.whitespacesAndNewlines)
 
         var cleansedDescriptionLines = [String]()
 
@@ -35,6 +37,7 @@ public final class Issue {
 
         return cleansedDescriptionLines
             .prefix(maxLines)
+            .filter { !$0.isEmpty }
             .reduce(into: "") { (total: inout String, current: String) in
                 if !total.isEmpty {
                     total += "\n"
@@ -44,7 +47,7 @@ public final class Issue {
                     let range = headlineMarkdown.upperBound ..< current.endIndex
                     lineToAdd = String(lineToAdd[range])
                 }
-                total += lineToAdd.trimmingCharacters(in: charsToTrim)
+                total += lineToAdd.trimmingCharacters(in: charsToTrim).replacingOccurrences(of: "_", with: "")
             }
     }
 }
