@@ -15,7 +15,7 @@ public final class Issue {
         // strip nasty carriage returns and other weird newline combinations
         guard let descriptionLines = fields.description?.components(separatedBy: .newlines).filter({ !$0.isEmpty }).map({ $0.trimmingCharacters(in: .whitespaces) }) else { return nil }
         let description = descriptionLines.joined(separator: "\n")
-        let charsToTrim = CharacterSet(charactersIn: "*:").union(.whitespacesAndNewlines)
+        let charsToTrim = CharacterSet(charactersIn: "+*:_-()/").union(.whitespacesAndNewlines)
 
         var cleansedDescriptionLines = [String]()
 
