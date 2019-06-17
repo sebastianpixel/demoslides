@@ -257,16 +257,23 @@ public final class LineSelector<DataSource: LineSelectorDataSource> {
         return lines.compactMap { line in
             let text = line.item.line
 
-            if line.isSelected {
-                line.text = hightlightTextProperties.apply(to: text)
-            } else if substring.isEmpty {
-                line.text = text
+            if substring.isEmpty {
+                if line.isSelected {
+                    line.text = hightlightTextProperties.apply(to: text)
+                } else {
+                    line.text = text
+                }
             } else if let lineTextRange = lineTextRange(in: text),
                 let highlightedRange = text.range(of: substring, options: [.regularExpression, .caseInsensitive], range: lineTextRange) {
-                let prefix = String(text[text.startIndex ..< highlightedRange.lowerBound])
-                let highlighted = hightlightTextProperties.apply(to: String(text[highlightedRange]))
-                let suffix = String(text[highlightedRange.upperBound ..< text.endIndex])
-                line.text = prefix + highlighted + suffix
+                // already selected lines remain fully highlighted
+                if line.isSelected {
+                    line.text = hightlightTextProperties.apply(to: text)
+                } else {
+                    let prefix = String(text[text.startIndex ..< highlightedRange.lowerBound])
+                    let highlighted = hightlightTextProperties.apply(to: String(text[highlightedRange]))
+                    let suffix = String(text[highlightedRange.upperBound ..< text.endIndex])
+                    line.text = prefix + highlighted + suffix
+                }
             } else {
                 return nil
             }
