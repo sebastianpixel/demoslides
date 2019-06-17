@@ -30,16 +30,22 @@ public final class Issue {
         // fallback
         if cleansedDescriptionLines.isEmpty {
             cleansedDescriptionLines = descriptionLines
-                .filter {
-                    let line = $0.trimmingCharacters(in: .whitespaces)
-                    return line.range(of: "^(h\\d|Android \\d|iOS \\d|AppService \\d)", options: .regularExpression) == nil
-                }
+                .filter { $0.range(of: "^(h\\d|Android \\d|iOS \\d|AppService \\d)", options: .regularExpression) == nil }
         }
 
         return cleansedDescriptionLines
             .prefix(maxLines)
-            .map { $0.trimmingCharacters(in: charsToTrim) }
-            .joined(separator: "\n")
+            .reduce(into: "") { (total: inout String, current: String) in
+                if !total.isEmpty {
+                    total += "\n"
+                }
+                var lineToAdd = current
+                if let headlineMarkdown = lineToAdd.range(of: "^h\\d\\.\\s?", options: .regularExpression) {
+                    let range = headlineMarkdown.upperBound ..< current.endIndex
+                    lineToAdd = String(lineToAdd[range])
+                }
+                total += lineToAdd.trimmingCharacters(in: charsToTrim)
+            }
     }
 }
 
