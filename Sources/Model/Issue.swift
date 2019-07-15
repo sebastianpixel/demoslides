@@ -17,7 +17,7 @@ public final class Issue {
             .components(separatedBy: .newlines)
             .map({ $0.trimmingCharacters(in: .whitespaces) }) else { return nil }
         let description = descriptionLines.joined(separator: "\n")
-        let charsToTrim = CharacterSet(charactersIn: "+*:-()/").union(.whitespacesAndNewlines)
+        let charsToTrim = CharacterSet(charactersIn: "+*:-/").union(.whitespacesAndNewlines)
 
         var cleansedDescriptionLines = [String]()
 
