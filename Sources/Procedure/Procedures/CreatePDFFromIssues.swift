@@ -36,8 +36,9 @@ public struct CreatePDFFromIssues: Procedure {
 
             // present the list of issues to the user to discard unwanted
             let previouslySelected = (Env.current.defaults[.selectedIssues] as [String]?) ?? []
+            let atLeastOneCurrentIssueWasPreviouslySelected = issues.contains { issue in previouslySelected.contains(issue.key) }
             let dataSource = GenericLineSelectorDataSource(items: issues) {
-                ("\($0.key) \($0.fields.summary)", previouslySelected.contains($0.key))
+                ("\($0.key) \($0.fields.summary)", atLeastOneCurrentIssueWasPreviouslySelected ? previouslySelected.contains($0.key) : true)
             }
             guard let selectedIssues = LineSelector(dataSource: dataSource)?.multiSelection()?.output,
                 !selectedIssues.isEmpty else { throw Error.noIssuesSelected }
