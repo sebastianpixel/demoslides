@@ -104,7 +104,21 @@ public struct CreatePDFFromIssues: Procedure {
         // Data to print
         let issuesWithCategoryDisplayNameAndCategoryAndEpic = issues.compactMap { issue -> (issue: Issue, categoryDisplayName: String, category: IssueCategory, epic: Epic)? in
             let epicLink = issue.fields.epicLink ?? IssueCategory.featureKey
-            guard let (categoryDisplayName, category, epic) = getCategory(epicLink: epicLink, epics: epics, config: config) ?? getCategory(epicLink: epicLink, epics: epics, config: updateConfig(newEpicLink: epicLink, config: config, epics: epics)) else { return nil }
+            guard let (categoryDisplayName, category, epic) = getCategory(
+                epicLink: epicLink,
+                epics: epics,
+                config: Env.current.configStore.config ?? config // Config could have been updated in the meantime
+                )
+                ?? getCategory(
+                    epicLink: epicLink,
+                    epics: epics,
+                    config: updateConfig(
+                        newEpicLink: epicLink,
+                        config: Env.current.configStore.config ?? config,
+                        epics: epics
+                    )
+                )
+                else { return nil }
             return (issue, categoryDisplayName, category, epic)
         }
         .sorted { $0.categoryDisplayName < $1.categoryDisplayName }
