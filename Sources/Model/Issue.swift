@@ -32,12 +32,12 @@ public final class Issue {
         // fallback
         if cleansedDescriptionLines.isEmpty {
             cleansedDescriptionLines = descriptionLines
-                .filter { $0.range(of: "^(h\\d|Android \\d|iOS \\d|AppService \\d)", options: .regularExpression) == nil }
+                .filter { $0.range(of: "^(h\\d|Android.? \\d|iOS.? \\d|AppService.? \\d)", options: .regularExpression) == nil && !$0.isEmpty }
         }
 
         return cleansedDescriptionLines
+            .trimmed
             .prefix(maxLines)
-            .filter { !$0.isEmpty }
             .reduce(into: "") { (total: inout String, current: String) in
                 if !total.isEmpty {
                     total += "\n"
@@ -49,6 +49,19 @@ public final class Issue {
                 }
                 total += lineToAdd.trimmingCharacters(in: charsToTrim).replacingOccurrences(of: "_", with: "")
             }
+    }
+}
+
+private extension Array where Element == String {
+    var trimmed: [String] {
+        var lines = self
+        while lines.first?.isEmpty == true {
+            lines.removeFirst()
+        }
+        while lines.last?.isEmpty == true {
+            lines.removeLast()
+        }
+        return lines
     }
 }
 
