@@ -91,6 +91,16 @@ public extension Issue {
             case summary, parent, issuetype, updated, description, fixVersions, customfield_10522
         }
 
+        public init(summary: String, parent: Issue?, issuetype: IssueType, updated: Date?, description: String?, fixVersions: [FixVersion], epicLink: String?) {
+            self.summary = summary
+            self.parent = parent
+            self.issuetype = issuetype
+            self.updated = updated
+            self.description = description
+            self.fixVersions = fixVersions
+            self.epicLink = epicLink
+        }
+
         public init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: CodingKeys.self)
             summary = try container.decode(String.self, forKey: .summary)

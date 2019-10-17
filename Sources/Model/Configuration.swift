@@ -14,11 +14,15 @@ public struct Configuration: Codable {
     public var categories: [String: IssueCategory]
 
     public static func `default`(for project: String, with categories: [String: IssueCategory], jiraHost: String) -> Configuration {
+        var categories = categories
+        categories[IssueCategory.featureKey] = IssueCategory.featureValue
+
         return Configuration(
             jiraHost: jiraHost,
             jiraProject: project,
             textResources: [
-                "aim": "Ziel:"
+                "aim": "Ziel:",
+                "sprint_goal": "Sprintziel"
             ],
             fixVersionEmojis: Issue.FixVersion.emojiMapping,
             descriptionPatterns: [
@@ -38,7 +42,7 @@ public struct Configuration: Codable {
             ),
             issuesPerPage: 2,
             limitToPrintableArea: true,
-            categories: { var categories = categories; categories[IssueCategory.featureKey] = IssueCategory.featureValue; return categories }()
+            categories: categories
         )
     }
 

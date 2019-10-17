@@ -9,7 +9,11 @@ public struct CreatePDFFromIssues: Procedure {
         case openPDF, noIssuesSelected, noIssuesLoaded, noConfig
     }
 
-    public init() {}
+    private let addSprintGoal: Bool
+
+    public init(addSprintGoal: Bool) {
+        self.addSprintGoal = addSprintGoal
+    }
 
     public func run() -> Bool {
         do {
@@ -102,7 +106,7 @@ public struct CreatePDFFromIssues: Procedure {
         let scale = CGFloat(1) / CGFloat(printedIssuesPerPage).squareRoot()
 
         // Data to print
-        let issuesWithCategoryDisplayNameAndCategoryAndEpic = issues.compactMap { issue -> (issue: Issue, categoryDisplayName: String, category: IssueCategory, epic: Epic)? in
+        var issuesWithCategoryDisplayNameAndCategoryAndEpic = issues.compactMap { issue -> (issue: Issue, categoryDisplayName: String, category: IssueCategory, epic: Epic)? in
             let epicLink = issue.fields.epicLink ?? IssueCategory.featureKey
             guard let (categoryDisplayName, category, epic) = getCategory(
                 epicLink: epicLink,
@@ -123,9 +127,31 @@ public struct CreatePDFFromIssues: Procedure {
         }
         .sorted { $0.categoryDisplayName < $1.categoryDisplayName }
 
+        if addSprintGoal,
+            let goal = sprint.goal,
+            let (category, epic) = getSprintGoalCategory() {
+            issuesWithCategoryDisplayNameAndCategoryAndEpic.append((
+                issue: Issue(
+                    key: epic.fields.name,
+                    fields: .init(
+                        summary: goal,
+                        parent: nil,
+                        issuetype: .story,
+                        updated: nil,
+                        description: nil,
+                        fixVersions: [],
+                        epicLink: ""
+                    ),
+                    id: 0),
+                categoryDisplayName: epic.fields.name,
+                category: category,
+                epic: epic))
+        }
+
         var index = 0
         var done = false
-        let pagesCount = Int(ceil(Double(issuesWithCategoryDisplayNameAndCategoryAndEpic.count) / Double(printedIssuesPerPage)))
+
+        let pagesCount = Int((Double(issuesWithCategoryDisplayNameAndCategoryAndEpic.count) / Double(printedIssuesPerPage)).rounded(.up))
 
         // pages
         for _ in 0 ..< pagesCount {
@@ -362,6 +388,24 @@ public struct CreatePDFFromIssues: Procedure {
             .categories
             .first { (_: String, value: IssueCategory) -> Bool in value.epics.contains(epic.fields.name) }
             .map { ($0.key, $0.value, epic) }
+    }
+
+    private func getSprintGoalCategory() -> (category: IssueCategory, epic: Epic)? {
+        guard let config = Env.current.configStore.config,
+            let label = config.textResources["sprint_goal"] else { return nil }
+
+        let epic = Epic(fields: .init(name: label, summary: ""))
+        let category = config.categories[label] ?? {
+            Env.current.shell.write("No color defined for category \"\(label)\".")
+            let color = promptColor() ?? .black
+            let category = IssueCategory(epics: [label], color: color)
+            var config = config
+            config.categories[label] = category
+            Env.current.configStore.config = config
+            return category
+        }()
+
+        return (category, epic)
     }
 
     private func promptColor() -> Color? {

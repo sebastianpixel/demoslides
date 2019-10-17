@@ -5,6 +5,7 @@ public struct Sprint: Codable {
     public let viewBoardsUrl: String
     public let name: String
     public let id: Int
+    public let goal: String?
 
     public struct Response: Codable {
         public let sprints: [Sprint]
