@@ -14,6 +14,22 @@ git clone https://github.com/sebastianpixel/demoslides.git \
 
 You can then execute the tool via `demoslides`. If there is no configuration file in the directory in which you're running the tool, the file `demoslides.yml` will be created. For this you need to provide the host of your JIRA server (like "jira.mycompany.com") and select the JIRA project for which you'd like to create demo slides.
 
+## Usage
+```
+USAGE: demoslides [<option> ...] [--] [<arg> ...]
+OPTIONS:
+  -d, --debug
+      Print network requests, responses, received JSON, shell commands with output and errors.
+  -h, --help
+      Print the usage description
+  -i, --init
+      Select the JIRA project and create a config file in the current working directory without creating a PDF.
+  -r, --reset-login
+      Reset the login information in User Defaults (username) and Keychain (password).
+  -g, --goal
+      Adds a separate slide for the sprint goal.
+```
+
 ## Configuration
 The tool is based on the assumption that you categorize your JIRA issues by fixVersions and epics. FixVersions can optionally be mapped to emoji (like when you use the fixVersions "iOS" => "🍏" or "Android" => "🤖"). If there is no mapping the default is to just print the fixVersion.
 
