@@ -3,11 +3,11 @@ import Foundation
 import Model
 
 public struct GetIssuesBySprint: Request {
-    let sprint: Sprint
+    let sprint: SprintJQL
     let exclude: [Issue.IssueType]
     let limit: Int
 
-    public init(sprint: Sprint, exclude: [Issue.IssueType], limit: Int) {
+    public init(sprint: SprintJQL, exclude: [Issue.IssueType], limit: Int) {
         self.sprint = sprint
         self.exclude = exclude
         self.limit = limit

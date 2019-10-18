@@ -1,23 +1,12 @@
 import Foundation
 
 public struct Sprint: Codable {
-    public let closed: Bool
-    public let viewBoardsUrl: String
-    public let name: String
     public let id: Int
-    public let goal: String?
-
-    public struct Response: Codable {
-        public let sprints: [Sprint]
-    }
-
-    public var trainCasedName: String {
-        let nonAlphaNumerics = CharacterSet.alphanumerics.inverted
-        return name
-            .folding(options: [.diacriticInsensitive, .widthInsensitive, .caseInsensitive], locale: nil)
-            .lowercased()
-            .components(separatedBy: nonAlphaNumerics)
-            .filter { !$0.isEmpty }
-            .joined(separator: "-")
-    }
+    public let `self`: String
+    public let state: String
+    public let name: String
+    public let startDate: Date
+    public let endDate: Date
+    public let originBoardId: Int
+    public let goal: String
 }

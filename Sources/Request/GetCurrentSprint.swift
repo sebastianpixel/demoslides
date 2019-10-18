@@ -9,7 +9,7 @@ public struct GetCurrentSprint: Request {
         self.jiraProject = jiraProject
     }
 
-    public typealias Response = Sprint.Response
+    public typealias Response = SprintJQL.Response
 
     public let method = HTTPMethod.get
     public let host = Env.current.configStore.config?.jiraHost

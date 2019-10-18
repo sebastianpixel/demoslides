@@ -74,7 +74,7 @@ public struct CreatePDFFromIssues: Procedure {
         return true
     }
 
-    private func drawPDF(in file: File, for issues: [Issue], sprint: Sprint, with epics: [String: Epic], config: Configuration) {
+    private func drawPDF(in file: File, for issues: [Issue], sprint: SprintJQL, with epics: [String: Epic], config: Configuration) {
         // calculate power of two of maximum fitting issues on one page with columns and rows
         let ceilLg = log2(CGFloat(config.issuesPerPage)).rounded(.up)
         let printedIssuesPerPage = pow(2, ceilLg)
@@ -128,7 +128,7 @@ public struct CreatePDFFromIssues: Procedure {
         .sorted { $0.categoryDisplayName < $1.categoryDisplayName }
 
         if addSprintGoal,
-            let goal = sprint.goal,
+            let goal = GetSprint(id: sprint.id).awaitResponseWithDebugPrinting()?.goal,
             let (category, epic) = getSprintGoalCategory() {
             issuesWithCategoryDisplayNameAndCategoryAndEpic.append((
                 issue: Issue(
@@ -347,7 +347,7 @@ public struct CreatePDFFromIssues: Procedure {
         graphicsContext.closePDF()
     }
 
-    private func metadata(for sprint: Sprint) -> CFDictionary {
+    private func metadata(for sprint: SprintJQL) -> CFDictionary {
         return [
             kCGPDFContextCreator: Env.current.toolName,
             kCGPDFContextAuthor: NSFullUserName(),
