@@ -275,12 +275,18 @@ public struct CreatePDFFromIssues: Procedure {
                     graphicsContext.setFillColor(NSColor.white.cgColor)
                     graphicsContext.fill(contentBackgroundRect)
 
-                    let cleansedDescription = issue
+                    var (cleansedDescription, appliedRange) = issue
                         .cleansedDescription(
                             ranges: config.descriptionPatterns,
                             maxLines: config.descriptionLinesMax
-                        )?
-                        .trimmingCharacters(in: .whitespacesAndNewlines)
+                        )
+
+                    cleansedDescription = cleansedDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                    if Env.current.debug {
+                        appliedRange.map { Env.current.shell.write("\nCleansed description with range \($0)") }
+                        Env.current.shell.write("\nCleansed description:\n\(cleansedDescription ?? "")")
+                    }
 
                     // draw summary and description
                     let textsWithfontStyle = [

@@ -11,20 +11,22 @@ public final class Issue {
         self.id = id
     }
 
-    public func cleansedDescription(ranges: [DescriptionRange], maxLines: Int) -> String? {
+    public func cleansedDescription(ranges: [DescriptionRange], maxLines: Int) -> (string: String?, appliedRange: DescriptionRange?) {
         guard let descriptionLines = fields.description?
             .replacingOccurrences(of: "\r", with: "")
             .components(separatedBy: .newlines)
-            .map({ $0.trimmingCharacters(in: .whitespaces) }) else { return nil }
+            .map({ $0.trimmingCharacters(in: .whitespaces) }) else { return (nil, nil) }
         let description = descriptionLines.joined(separator: "\n")
         let charsToTrim = CharacterSet(charactersIn: "+*:-/").union(.whitespacesAndNewlines)
 
         var cleansedDescriptionLines = [String]()
+        var appliedRange: DescriptionRange?
 
         for range in ranges {
             if let startPattern = description.range(of: range.beginAfterPattern, options: .regularExpression),
                 let endPattern = description.range(of: range.endBeforePattern, options: .regularExpression, range: startPattern.upperBound ..< description.endIndex) {
                 cleansedDescriptionLines = description[startPattern.upperBound ..< endPattern.lowerBound].components(separatedBy: .newlines)
+                appliedRange = range
                 break
             }
         }
@@ -35,7 +37,7 @@ public final class Issue {
                 .filter { $0.range(of: "^(h\\d|Android.? \\d|iOS.? \\d|AppService.? \\d)", options: .regularExpression) == nil && !$0.isEmpty }
         }
 
-        return cleansedDescriptionLines
+        let result = cleansedDescriptionLines
             .trimmed
             .prefix(maxLines)
             .reduce(into: "") { (total: inout String, current: String) in
@@ -49,6 +51,8 @@ public final class Issue {
                 }
                 total += lineToAdd.trimmingCharacters(in: charsToTrim).replacingOccurrences(of: "_", with: "")
             }
+
+        return (result, appliedRange)
     }
 }
 
