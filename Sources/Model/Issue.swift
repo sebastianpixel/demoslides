@@ -23,9 +23,17 @@ public final class Issue {
         var appliedRange: DescriptionRange?
 
         for range in ranges {
-            if let startPattern = description.range(of: range.beginAfterPattern, options: .regularExpression),
-                let endPattern = description.range(of: range.endBeforePattern, options: .regularExpression, range: startPattern.upperBound ..< description.endIndex) {
-                cleansedDescriptionLines = description[startPattern.upperBound ..< endPattern.lowerBound].components(separatedBy: .newlines)
+
+            let start = range.beginAfterPattern.isEmpty
+                ? Range(.init(location: 0, length: 0), in: description)
+                : description.range(of: range.beginAfterPattern, options: .regularExpression)
+            let end = range.endBeforePattern.isEmpty
+                ? Range(NSRange(location: description.count - 1, length: 0), in: description)
+                : description.range(of: range.endBeforePattern, options: .regularExpression, range: (start?.upperBound ?? description.startIndex) ..< description.endIndex)
+
+            if let start = start,
+                let end = end {
+                cleansedDescriptionLines = description[start.upperBound ..< end.lowerBound].components(separatedBy: .newlines)
                 appliedRange = range
                 break
             }
