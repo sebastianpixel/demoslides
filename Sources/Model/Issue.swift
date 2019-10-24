@@ -22,18 +22,23 @@ public final class Issue {
         var cleansedDescriptionLines = [String]()
         var appliedRange: DescriptionRange?
 
-        for range in ranges {
-
+        for range in ranges where !(range.beginAfterPattern.isEmpty || range.beginAfterPattern.isEmpty) {
             let start = range.beginAfterPattern.isEmpty
-                ? Range(.init(location: 0, length: 0), in: description)
-                : description.range(of: range.beginAfterPattern, options: .regularExpression)
+                ? description.startIndex
+                : description.range(
+                    of: range.beginAfterPattern,
+                    options: .regularExpression
+                    )?.upperBound
             let end = range.endBeforePattern.isEmpty
-                ? Range(NSRange(location: description.count - 1, length: 0), in: description)
-                : description.range(of: range.endBeforePattern, options: .regularExpression, range: (start?.upperBound ?? description.startIndex) ..< description.endIndex)
+                ? description.endIndex
+                : description.range(
+                    of: range.endBeforePattern,
+                    options: .regularExpression,
+                    range: (start ?? description.startIndex) ..< description.endIndex
+                )?.lowerBound
 
-            if let start = start,
-                let end = end {
-                cleansedDescriptionLines = description[start.upperBound ..< end.lowerBound].components(separatedBy: .newlines)
+            if let start = start, let end = end {
+                cleansedDescriptionLines = description[start ..< end].components(separatedBy: .newlines)
                 appliedRange = range
                 break
             }
