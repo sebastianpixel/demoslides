@@ -22,7 +22,7 @@ public final class Issue {
         var cleansedDescriptionLines = [String]()
         var appliedRange: DescriptionRange?
 
-        for range in ranges where !(range.beginAfterPattern.isEmpty || range.beginAfterPattern.isEmpty) {
+        for range in ranges {
             let start = range.beginAfterPattern.isEmpty
                 ? description.startIndex
                 : description.range(
