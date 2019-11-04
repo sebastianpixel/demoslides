@@ -28,20 +28,18 @@ public final class Issue {
                 : description.range(
                     of: range.beginAfterPattern,
                     options: .regularExpression
-                    )?.upperBound
+                )?.upperBound ?? description.startIndex
             let end = range.endBeforePattern.isEmpty
                 ? description.endIndex
                 : description.range(
                     of: range.endBeforePattern,
                     options: .regularExpression,
-                    range: (start ?? description.startIndex) ..< description.endIndex
-                )?.lowerBound
+                    range: start ..< description.endIndex
+                )?.lowerBound ?? description.endIndex
 
-            if let start = start, let end = end {
                 cleansedDescriptionLines = description[start ..< end].components(separatedBy: .newlines)
                 appliedRange = range
                 break
-            }
         }
 
         // fallback
