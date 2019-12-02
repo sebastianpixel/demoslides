@@ -33,8 +33,6 @@ public struct CreateAdditionalIssue: Procedure {
         let lineSelector = LineSelector(dataSource: dataSource)
         let selectedCategory = lineSelector?.singleSelection()?.output ?? ""
 
-        LineDrawer(linesToDrawCount: 3).reset()
-
         let issue = Issue(
             key: "NOISSUE",
             fields: .init(
