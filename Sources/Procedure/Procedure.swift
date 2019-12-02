@@ -20,4 +20,8 @@ extension Procedure {
             }
         }
     }
+
+    var directory: Directory {
+        return try! Env.current.directory.init(path: .current, create: false) 
+    }
 }

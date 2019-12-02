@@ -26,8 +26,10 @@ OPTIONS:
       Select the JIRA project and create a config file in the current working directory without creating a PDF.
   -r, --reset-login
       Reset the login information in User Defaults (username) and Keychain (password).
-  -g, --goal
-      Adds a separate slide for the sprint goal.
+  -c, --create-additional-issues
+      Create issues in addition to the ones downloaded from the current sprint in JIRA.
+  -r, --remove-additionally-created-issues
+      Remove additionally created issues.
 ```
 
 ## Configuration

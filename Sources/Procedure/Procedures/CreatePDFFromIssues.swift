@@ -14,6 +14,7 @@ public struct CreatePDFFromIssues: Procedure {
     public init() {}
 
     public func run() -> Bool {
+        var result = true
         do {
             guard let config = Env.current.configStore.config ?? {
                 // run init if there is no config file
@@ -52,13 +53,16 @@ public struct CreatePDFFromIssues: Procedure {
             // resolve epic links for each issue
             let epics = getEpics(for: selectedIssues)
 
-            let directory = try Env.current.directory.init(path: .current, create: false)
-
             // get file URL for PDF
             let file = directory.file("\(sprint.trainCasedName).pdf")
 
             // fill the PDF with the issues of the current sprint
             drawPDF(in: file, for: selectedIssues, sprint: sprint, with: epics, config: config)
+
+            if directory.file(CreateAdditionalIssue.fileName).exists,
+                Env.current.shell.promptDecision("Remove additionally created issues?") {
+                result = RemoveAdditionalIssues().run()
+            }
 
             // open the PDF
             if !Env.current.workspace.open(file.path.url) {
@@ -66,10 +70,10 @@ public struct CreatePDFFromIssues: Procedure {
             }
         } catch {
             Env.current.shell.write("\(error)")
-            return false
+            result = false
         }
 
-        return true
+        return result
     }
 
     private func drawPDF(in file: File, for issues: [Issue], sprint: SprintJQL, with epics: [String: Epic], config: Configuration) {
@@ -145,6 +149,22 @@ public struct CreatePDFFromIssues: Procedure {
                 categoryDisplayName: epic.fields.name,
                 category: category,
                 epic: epic))
+        }
+
+        // add additionally created issues
+        if let additionalIssuesEncoced = try? directory.file(CreateAdditionalIssue.fileName).read(),
+            let additionalIssues = try? YAMLDecoder().decode([Issue].self, from: additionalIssuesEncoced) {
+            for issue in additionalIssues {
+                guard let customCategory = issue.customCategory,
+                    let issueCateogory = config.categories[customCategory] else { continue }
+                let epic = Epic(fields: .init(name: customCategory, summary: ""))
+                issuesWithCategoryDisplayNameAndCategoryAndEpic.append((
+                    issue: issue,
+                    categoryDisplayName: customCategory,
+                    category: issueCateogory,
+                    epic: epic
+                ))
+            }
         }
 
         var index = 0

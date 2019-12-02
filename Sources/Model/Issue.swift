@@ -4,11 +4,13 @@ public final class Issue {
     public let id: Int
     public let key: String
     public let fields: Fields
+    public let customCategory: String?
 
-    public init(key: String, fields: Fields, id: Int) {
+    public init(key: String, fields: Fields, id: Int, customCategory: String? = nil) {
         self.key = key
         self.fields = fields
         self.id = id
+        self.customCategory = customCategory
     }
 
     public func cleansedDescription(ranges: [DescriptionRange], maxLines: Int) -> (string: String?, appliedRange: DescriptionRange?) {
@@ -86,6 +88,7 @@ extension Issue: Equatable {
         return lhs.id == rhs.id
             && lhs.key == rhs.key
             && lhs.fields == rhs.fields
+            && lhs.customCategory == rhs.customCategory
     }
 }
 
@@ -167,7 +170,7 @@ public extension Issue {
 
 extension Issue: Codable {
     enum CodingKeys: String, CodingKey {
-        case key, fields, id
+        case key, fields, id, customCategory
     }
 
     public convenience init(from decoder: Decoder) throws {
@@ -175,12 +178,13 @@ extension Issue: Codable {
         let key = try container.decode(String.self, forKey: .key)
         let fields = try container.decode(Fields.self, forKey: .fields)
         let id = try container.decode(String.self, forKey: .id)
+        let customCategory = try container.decodeIfPresent(String.self, forKey: .customCategory)
 
         guard let idAsInt = Int(id) else {
             throw DecodingError.typeMismatch(Int.self, DecodingError.Context(codingPath: [CodingKeys.id], debugDescription: "Could not convert \(id) to Int"))
         }
 
-        self.init(key: key, fields: fields, id: idAsInt)
+        self.init(key: key, fields: fields, id: idAsInt, customCategory: customCategory)
     }
 
     public func encode(to encoder: Encoder) throws {
@@ -188,5 +192,6 @@ extension Issue: Codable {
         try container.encode(key, forKey: .key)
         try container.encode(fields, forKey: .fields)
         try container.encode("\(id)", forKey: .id)
+        try container.encodeIfPresent(customCategory, forKey: .customCategory)
     }
 }
