@@ -24,19 +24,19 @@ public final class Issue {
         var appliedRange: DescriptionRange?
 
         for range in ranges {
-            let start = range.beginAfterPattern.isEmpty
+            guard let start = range.beginAfterPattern.isEmpty
                 ? description.startIndex
                 : description.range(
                     of: range.beginAfterPattern,
                     options: .regularExpression
-                )?.upperBound ?? description.startIndex
+                )?.upperBound,
             let end = range.endBeforePattern.isEmpty
                 ? description.endIndex
                 : description.range(
                     of: range.endBeforePattern,
                     options: .regularExpression,
                     range: start ..< description.endIndex
-                )?.lowerBound ?? description.endIndex
+                )?.lowerBound else { continue }
 
                 cleansedDescriptionLines = description[start ..< end].components(separatedBy: .newlines)
                 appliedRange = range
