@@ -15,6 +15,7 @@ public final class Issue {
         guard let descriptionLines = fields.description?
             .replacingOccurrences(of: "\r", with: "")
             .components(separatedBy: .newlines)
+            .filter({ !$0.isEmpty })
             .map({ $0.trimmingCharacters(in: .whitespaces) }) else { return (nil, nil) }
         let description = descriptionLines.joined(separator: "\n")
         let charsToTrim = CharacterSet(charactersIn: "+*:-/").union(.whitespacesAndNewlines)
