@@ -9,7 +9,6 @@ let debug = flags.option("d", "debug", description: "Print network requests, res
 let help = flags.option("h", "help", description: "Print the usage description")
 let initialize = flags.option("i", "init", description: "Select the JIRA project and create a config file in the current working directory without creating a PDF.")
 let reset = flags.option("r", "reset-login", description: "Reset the login information in User Defaults (username) and Keychain (password).")
-let addSprintGoal = flags.option("g", "goal", description: "Adds a separate slide for the sprint goal.")
 
 if let failure = flags.parsingFailure() {
     Env.current.shell.write(failure)
@@ -25,5 +24,5 @@ if help.wasSet {
 } else if reset.wasSet {
     run(ResetLogin())
 } else {
-    run(CreatePDFFromIssues(addSprintGoal: addSprintGoal.wasSet))
+    run(CreatePDFFromIssues())
 }

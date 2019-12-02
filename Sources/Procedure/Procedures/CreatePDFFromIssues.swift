@@ -4,17 +4,14 @@ import Model
 import Quartz
 import Request
 import UI
+import Yams
 
 public struct CreatePDFFromIssues: Procedure {
     enum Error: Swift.Error {
         case openPDF, noIssuesSelected, noIssuesLoaded, noConfig
     }
 
-    private let addSprintGoal: Bool
-
-    public init(addSprintGoal: Bool) {
-        self.addSprintGoal = addSprintGoal
-    }
+    public init() {}
 
     public func run() -> Bool {
         do {
@@ -128,7 +125,8 @@ public struct CreatePDFFromIssues: Procedure {
         }
         .sorted { $0.categoryDisplayName < $1.categoryDisplayName }
 
-        if addSprintGoal,
+        // add sprint goal slide
+        if Env.current.shell.promptDecision("Add slide for current sprint goal?"),
             let goal = GetSprint(id: sprint.id).awaitResponseWithDebugPrinting()?.goal,
             let (category, epic) = getSprintGoalCategory() {
             issuesWithCategoryDisplayNameAndCategoryAndEpic.append((
