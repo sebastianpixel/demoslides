@@ -19,19 +19,25 @@ public struct CreateAdditionalIssue: Procedure {
         }
 
         Env.current.shell.write("""
+
         Create an issue to add to the PDF in addition to the ones downloaded from JIRA.
         Remove the file with the -r option.
+
         """)
 
         guard let summary = Env.current.shell.prompt("Summary") else { return true }
         let description = Env.current.shell.prompt("Description (optional)")
 
-        Env.current.shell.write("Category:")
+        let categoryOutput = "\(Prompt().prefix)Category:"
+        Env.current.shell.write(categoryOutput)
 
         let items = Array(categories).filter { $0 != Env.current.configStore.config?.textResources["sprint_goal"] }
         let dataSource = GenericLineSelectorDataSource(items: items) { ($0, false) }
         let lineSelector = LineSelector(dataSource: dataSource)
         let selectedCategory = lineSelector?.singleSelection()?.output ?? ""
+
+        LineDrawer(linesToDrawCount: 0).reset(lines: 1)
+        Env.current.shell.write("\(categoryOutput) \(selectedCategory)")
 
         let issue = Issue(
             key: "NOISSUE",
