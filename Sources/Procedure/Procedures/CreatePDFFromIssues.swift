@@ -1,3 +1,4 @@
+import CommandLineKit
 import Environment
 import Model
 import Quartz
@@ -275,23 +276,36 @@ public struct CreatePDFFromIssues: Procedure {
                     graphicsContext.setFillColor(NSColor.white.cgColor)
                     graphicsContext.fill(contentBackgroundRect)
 
-                    var (cleansedDescription, appliedRange) = issue
+                    let (cleansedDescription, appliedRange) = issue
                         .cleansedDescription(
                             ranges: config.descriptionPatterns,
                             maxLines: config.descriptionLinesMax
                         )
 
-                    cleansedDescription = cleansedDescription?.trimmingCharacters(in: .whitespacesAndNewlines)
-
                     if Env.current.debug {
-                        appliedRange.map { Env.current.shell.write("\nCleansed description with range \($0)") }
-                        Env.current.shell.write("\nCleansed description:\n\(cleansedDescription ?? "")")
+                        let green = TextProperties(.green, nil)
+                        let blue = TextProperties(.blue, nil)
+                        let grey = TextProperties(.grey, nil)
+                        Env.current.shell.write("""
+
+                        \(green.apply(to: "Issue \(issue.key): \(issue.fields.summary)"))
+
+                        \(blue.apply(to: "* Original description:"))
+                        \(issue.fields.description.map(grey.apply(to:)) ?? "No description")
+
+                        \(blue.apply(to: "* Cleansed description:"))
+                        \(cleansedDescription ?? "No cleansed description")
+
+                        \(blue.apply(to: "* Applied range:"))
+                        \(appliedRange.map{ String(describing: $0) } ?? "No range applied")
+
+                        """)
                     }
 
                     // draw summary and description
                     let textsWithfontStyle = [
                         (issue.fields.summary, config.fontSettings.summary),
-                        (cleansedDescription == nil ? nil : config.textResources["aim"], config.fontSettings.aim),
+                        ((cleansedDescription == nil || cleansedDescription?.isEmpty == true) ? nil : config.textResources["aim"], config.fontSettings.aim),
                         (cleansedDescription, config.fontSettings.description)
                     ]
 
