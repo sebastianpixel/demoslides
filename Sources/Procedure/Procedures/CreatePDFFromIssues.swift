@@ -152,8 +152,8 @@ public struct CreatePDFFromIssues: Procedure {
         }
 
         // add additionally created issues
-        if let additionalIssuesEncoced = try? directory.file(CreateAdditionalIssue.fileName).read(),
-            let additionalIssues = try? YAMLDecoder().decode([Issue].self, from: additionalIssuesEncoced) {
+        if let additionalIssuesEncoded = try? directory.file(CreateAdditionalIssue.fileName).read(),
+            let additionalIssues = try? YAMLDecoder().decode([Issue].self, from: additionalIssuesEncoded) {
             for issue in additionalIssues {
                 guard let customCategory = issue.customCategory,
                     let issueCateogory = config.categories[customCategory] else { continue }
