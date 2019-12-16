@@ -74,17 +74,7 @@ public final class LineSelector<DataSource: LineSelectorDataSource> {
     public func multiSelection() -> MultiSelection? {
         isMultiselectEnabled = true
         guard let input = waitForInput() else { return nil }
-
-        var selectedModels = filteredLines.compactMap { $0.isSelected ? $0.item.model : nil }
-        // If selectedModels is empty, i.e. no line was selected, multiSelection
-        // behaves like singleSelection. If lines are already selected the line
-        // at the cursor position should not be added when enter is pressed.
-        if selectedModels.isEmpty,
-            let selectedModel = selectedModel,
-            !selectedModels.contains(where: { $0 == selectedModel }) {
-            selectedModels.append(selectedModel)
-        }
-
+        let selectedModels = filteredLines.compactMap { $0.isSelected ? $0.item.model : nil }
         return (input, selectedModels)
     }
 

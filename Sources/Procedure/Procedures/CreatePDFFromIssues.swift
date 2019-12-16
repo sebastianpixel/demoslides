@@ -43,8 +43,7 @@ public struct CreatePDFFromIssues: Procedure {
             let dataSource = GenericLineSelectorDataSource(items: issues) {
                 ("\($0.key) \($0.fields.summary)", atLeastOneCurrentIssueWasPreviouslySelected ? previouslySelected.contains($0.key) : true)
             }
-            guard let selectedIssues = LineSelector(dataSource: dataSource)?.multiSelection()?.output,
-                !selectedIssues.isEmpty else { throw Error.noIssuesSelected }
+            let selectedIssues = LineSelector(dataSource: dataSource)?.multiSelection()?.output ?? []
             Env.current.defaults[.selectedIssues] = selectedIssues.map { $0.key }
 
             // remove the usage description for LineSelector
@@ -166,6 +165,8 @@ public struct CreatePDFFromIssues: Procedure {
                 ))
             }
         }
+
+        guard !issuesWithCategoryDisplayNameAndCategoryAndEpic.isEmpty else { throw Error.noIssuesSelected }
 
         var index = 0
         var done = false
