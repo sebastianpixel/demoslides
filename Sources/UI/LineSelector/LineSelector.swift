@@ -139,14 +139,18 @@ public final class LineSelector<DataSource: LineSelectorDataSource> {
         switch input {
         case .ShiftTab where isMultiselectEnabled && !cursor.isInDefaultRow,
              .controlCharacter(.Tab) where isMultiselectEnabled && !cursor.isInDefaultRow && filteredLine(at: cursor.row) == filteredLines.last:
-            selectLineInCursorRowWithoutRedrawing()
+            selectLineWithoutRedrawing(row: cursor.row)
             moveDownIfPossible()
+            return false
+        case .controlCharacter(.Enter) where cursor.isInDefaultRow && allLines.count != filteredLines.count:
+            selectLineWithoutRedrawing(row: 0)
+            redrawWithoutFiltering()
             return false
         case .controlCharacter(.Tab) where isMultiselectEnabled && cursor.isInDefaultRow:
             moveUpIfPossible()
             return false
         case .controlCharacter(.Tab) where isMultiselectEnabled && !cursor.isInDefaultRow:
-            selectLineInCursorRowWithoutRedrawing()
+            selectLineWithoutRedrawing(row: cursor.row)
             moveUpIfPossible()
             return false
         case .move(.up):
@@ -214,9 +218,9 @@ public final class LineSelector<DataSource: LineSelectorDataSource> {
     }
 
     /// Toggle selection state of line without redrawing
-    private func selectLineInCursorRowWithoutRedrawing() {
+    private func selectLineWithoutRedrawing(row: Int) {
         allLines
-            .first { $0.text == filteredLine(at: cursor.row)?.text }?
+            .first { $0.text == filteredLine(at: row)?.text }?
             .isSelected
             .toggle()
     }
