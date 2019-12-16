@@ -56,7 +56,7 @@ public struct CreatePDFFromIssues: Procedure {
             let file = directory.file("\(sprint.trainCasedName).pdf")
 
             // fill the PDF with the issues of the current sprint
-            drawPDF(in: file, for: selectedIssues, sprint: sprint, with: epics, config: config)
+            try drawPDF(in: file, for: selectedIssues, sprint: sprint, with: epics, config: config)
 
             if directory.file(CreateAdditionalIssue.fileName).exists,
                 Env.current.shell.promptDecision("Remove additionally created issues?") {
@@ -75,7 +75,7 @@ public struct CreatePDFFromIssues: Procedure {
         return result
     }
 
-    private func drawPDF(in file: File, for issues: [Issue], sprint: SprintJQL, with epics: [String: Epic], config: Configuration) {
+    private func drawPDF(in file: File, for issues: [Issue], sprint: SprintJQL, with epics: [String: Epic], config: Configuration) throws {
         // calculate power of two of maximum fitting issues on one page with columns and rows
         let ceilLg = log2(CGFloat(config.issuesPerPage)).rounded(.up)
         let printedIssuesPerPage = pow(2, ceilLg)

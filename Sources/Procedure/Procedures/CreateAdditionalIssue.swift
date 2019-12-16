@@ -40,7 +40,7 @@ public struct CreateAdditionalIssue: Procedure {
         Env.current.shell.write("\(categoryOutput) \(selectedCategory)")
 
         let issue = Issue(
-            key: "NOISSUE",
+            key: "ADDITIONAL",
             fields: .init(
                 summary: summary,
                 parent: nil,
