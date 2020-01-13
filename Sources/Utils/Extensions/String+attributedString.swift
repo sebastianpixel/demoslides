@@ -7,7 +7,7 @@ public extension String {
         var height = size.height
         let range = NSRange(location: 0, length: utf16.count)
         var font: NSFont {
-            return NSFont.getFromGoogleIfNeeded(name: fontName, size: fontSize) ?? .systemFont(ofSize: fontSize)
+            return NSFont.getFromBrewIfNeeded(name: fontName, size: fontSize) ?? .systemFont(ofSize: fontSize)
         }
 
         repeat {

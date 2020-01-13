@@ -16,7 +16,7 @@ public struct FontStyle: Codable {
         var attributes: [NSAttributedString.Key: Any] = [
             .foregroundColor: color.nsColor,
             .paragraphStyle: paragraphStyle,
-            .font: NSFont.getFromGoogleIfNeeded(name: fontName, size: fontSize * scale) ?? .systemFont(ofSize: fontSize * scale)
+            .font: NSFont.getFromBrewIfNeeded(name: fontName, size: fontSize * scale) ?? .systemFont(ofSize: fontSize * scale)
         ]
         if isUnderlined {
             attributes[.underlineStyle] = NSUnderlineStyle.single.rawValue
