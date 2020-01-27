@@ -295,8 +295,9 @@ public struct CreatePDFFromIssues: Procedure {
                     graphicsContext.setFillColor(NSColor.white.cgColor)
                     graphicsContext.fill(contentBackgroundRect)
 
-                    let (cleansedDescription, appliedRange) = issue
-                        .cleansedDescription(
+                    let (cleansedDescription, appliedRange) = issue.key == CreateAdditionalIssue.issueKey
+                        ? (issue.fields.description, nil)
+                        : issue.cleansedDescription(
                             ranges: config.descriptionPatterns,
                             maxLines: config.descriptionLinesMax
                         )

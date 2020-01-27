@@ -6,6 +6,7 @@ import Yams
 public struct CreateAdditionalIssue: Procedure {
 
     static let fileName = "additionally_created_issues.yml"
+    static let issueKey = "ADDITIONAL"
 
     public init() {}
 
@@ -40,7 +41,7 @@ public struct CreateAdditionalIssue: Procedure {
         Env.current.shell.write("\(categoryOutput) \(selectedCategory)")
 
         let issue = Issue(
-            key: "ADDITIONAL",
+            key: CreateAdditionalIssue.issueKey,
             fields: .init(
                 summary: summary,
                 parent: nil,
