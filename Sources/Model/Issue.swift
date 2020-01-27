@@ -20,7 +20,7 @@ public final class Issue {
             .filter({ !$0.isEmpty })
             .map({ $0.trimmingCharacters(in: .whitespaces) }) else { return (nil, nil) }
         let description = descriptionLines.joined(separator: "\n")
-        let charsToTrim = CharacterSet(charactersIn: "+:-/").union(.whitespacesAndNewlines)
+        let charsToTrim = CharacterSet(charactersIn: "+-/").union(.whitespacesAndNewlines)
 
         var cleansedDescriptionLines = [String]()
         var appliedRange: DescriptionRange?
