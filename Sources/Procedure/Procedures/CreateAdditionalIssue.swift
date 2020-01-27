@@ -5,6 +5,10 @@ import Yams
 
 public struct CreateAdditionalIssue: Procedure {
 
+    private enum Error: Swift.Error {
+        case interactiveCommandFailed, noSummaryProvided
+    }
+
     static let fileName = "additionally_created_issues.yml"
     static let issueKey = "ADDITIONAL"
 
@@ -19,15 +23,15 @@ public struct CreateAdditionalIssue: Procedure {
                 return false
         }
 
-        Env.current.shell.write("""
-
-        Create an issue to add to the PDF in addition to the ones downloaded from JIRA.
-        Remove the file with the -r option.
-
-        """)
-
-        guard let summary = Env.current.shell.prompt("Summary") else { return true }
-        let description = Env.current.shell.prompt("Description (optional)")
+        let summary, description: String
+        switch promptToCreateSummaryAndDescription() {
+        case let .failure(error):
+            Env.current.shell.write(error.localizedDescription)
+            return false
+        case let .success(success):
+            summary = success.summary
+            description = success.description
+        }
 
         let categoryOutput = "\(Prompt().prefix)Category:"
         Env.current.shell.write(categoryOutput)
@@ -78,5 +82,43 @@ public struct CreateAdditionalIssue: Procedure {
         } else {
             return true
         }
+    }
+
+    private func promptToCreateSummaryAndDescription() -> Result<(summary: String, description: String), Swift.Error> {
+        let tempFile: File
+        do {
+            tempFile = try Env.current.file.init { template }
+        } catch {
+            return .failure(error)
+        }
+        defer { try? tempFile.remove() }
+
+        guard Env.current.shell.runForegroundTask("\(Env.current.shell.editor) \(tempFile.path)") else {
+            return .failure(Error.interactiveCommandFailed)
+        }
+
+        let arrays = tempFile.parse(markSwitchToSecondBlockLinePrefix: "# Description", markEndLinePrefix: nil)
+        let summary = arrays.firstBlock.filter { !$0.isEmpty }.joined(separator: " ").trimmingCharacters(in: .whitespacesAndNewlines)
+        let description = arrays.secondBlock.joined(separator: "\n").trimmingCharacters(in: .whitespacesAndNewlines)
+
+        if summary.isEmpty {
+            return .failure(Error.noSummaryProvided)
+        } else {
+            return .success((summary, description))
+        }
+    }
+
+    private var template: String {
+        """
+        # Summary
+
+        # Description (optional)
+
+        # Usage
+        # Enter a summary and an optional description to create an issue that
+        # will be added to the PDF in addition to the ones downloaded from JIRA.
+        # All lines starting with # will be ignored.
+        # Remove the file with the -r option.
+        """
     }
 }
