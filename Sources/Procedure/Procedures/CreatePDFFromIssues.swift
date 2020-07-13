@@ -373,9 +373,7 @@ public struct CreatePDFFromIssues: Procedure {
 
                     index += 1
 
-                    if index == issuesWithCategoryDisplayNameAndCategoryAndEpic.endIndex {
-                        done = true
-                    }
+                    done = index == issuesWithCategoryDisplayNameAndCategoryAndEpic.endIndex
                 }
             }
 
